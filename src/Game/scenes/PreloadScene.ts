@@ -1,6 +1,7 @@
 //#region import
 
 import Phaser from 'phaser';
+import Resizer from '~/Plugins/Resizer';
 import Globals from '../enums/Globals';
 import SceneKeys from '../enums/SceneKeys';
 
@@ -28,7 +29,13 @@ export default class PreloadScene extends Phaser.Scene {
         });
     }
 
-    create() {}
+    create() {
+        Resizer.camera = this.cameras.main;
+        Resizer.game = this.game;
+
+        this.scale.on(Phaser.Scale.Events.RESIZE, Resizer.onResize, Resizer);
+    }
+
     //#endregion
 
     //#region private methods
@@ -38,6 +45,9 @@ export default class PreloadScene extends Phaser.Scene {
             Globals.cards.push(card.code);
             this.load.image(card.code, card.image);
         }
+
+        this.load.start();
+        this.load.once('complete', this.onLoadingComplete, this);
     }
 
     //#endregion
@@ -46,5 +56,10 @@ export default class PreloadScene extends Phaser.Scene {
     //#endregion
 
     //#region event handlers
+
+    onLoadingComplete() {
+        this.scene.start(SceneKeys.Game);
+    }
+
     //#endregion
 }
