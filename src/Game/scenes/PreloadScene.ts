@@ -30,8 +30,8 @@ export default class PreloadScene extends Phaser.Scene {
     }
 
     create() {
-        Resizer.camera = this.cameras.main;
         Resizer.game = this.game;
+        Resizer.camera = this.cameras.main;
 
         this.scale.on(Phaser.Scale.Events.RESIZE, Resizer.onResize, Resizer);
     }

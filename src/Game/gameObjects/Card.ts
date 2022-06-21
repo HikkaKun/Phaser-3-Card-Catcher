@@ -6,10 +6,9 @@ import GameEvents from '../enums/GameEvents';
 
 //#endregion
 
+//#region class helpers
+//#endregion
 export default class Card extends Phaser.GameObjects.Image {
-    //#region class helpers
-    //#endregion
-
     //#region private fields
 
     private _tween!: Phaser.Tweens.Tween;
@@ -56,7 +55,7 @@ export default class Card extends Phaser.GameObjects.Image {
         this.setInteractive();
         this.init(flyDuration);
         this._handleEvents();
-        this.onResize(this.scene.scale.gameSize);
+        this.onResize(this.scene.scale.gameSize, this.scene.cameras.main.zoom);
     }
 
     //#endregion
@@ -88,10 +87,10 @@ export default class Card extends Phaser.GameObjects.Image {
         this.visible = false;
     }
 
-    onResize(gameSize: Phaser.Structs.Size) {
-        this.scale = gameSize.height / 4 / this.height;
+    onResize(gameSize: Phaser.Structs.Size, zoom: number) {
+        this.scale = gameSize.height / zoom / 4 / this.height;
 
-        this._sceneWidth = gameSize.width + this.height * this.scale;
+        this._sceneWidth = gameSize.width / zoom + this.height * this.scale;
     }
 
     onDown() {
