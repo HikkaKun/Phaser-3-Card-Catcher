@@ -1,7 +1,9 @@
 //#region import
 
 import Phaser from 'phaser';
+import Globals from '../enums/Globals';
 import SceneKeys from '../enums/SceneKeys';
+import Card from '../gameObjects/Card';
 
 //#endregion
 
@@ -19,6 +21,18 @@ export default class GameScene extends Phaser.Scene {
 
     constructor() {
         super(SceneKeys.Game);
+    }
+
+    create() {
+        const cameraCenter = this.add.container((this.game.config.width as number) / 2, (this.game.config.height as number) / 2);
+        this.cameras.main.startFollow(cameraCenter);
+
+        const card = new Card(this, (this.game.config.width as number) / 2, (this.game.config.height as number) / 2, Globals.getCardKey());
+        this.add.existing(card);
+
+        card.catchCallback = () => {
+            console.log('catch!');
+        };
     }
 
     //#endregion

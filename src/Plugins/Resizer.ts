@@ -1,6 +1,8 @@
 //#region import
 
 import Phaser from 'phaser';
+import GameEvents from '~/Game/enums/GameEvents';
+import SystemEvents from './SystemEvents/SystemEvents';
 
 //#endregion
 
@@ -32,7 +34,7 @@ class Resizer {
 
     //#region event handlers
 
-    onResize(gameSize, baseSize, displaySize, preWidth, preHeight) {
+    onResize(gameSize: Phaser.Structs.Size, baseSize, displaySize, preWidth, preHeight) {
         const camera = this.camera;
 
         const width = this.game.config.width as number;
@@ -42,7 +44,7 @@ class Resizer {
 
         camera.zoom = zoom;
 
-        console.log(zoom);
+        SystemEvents.emit(GameEvents.Resize, gameSize);
     }
 
     //#endregion

@@ -3,6 +3,7 @@ import 'regenerator-runtime/runtime';
 import Phaser from 'phaser';
 
 import PreloadScene from './Game/scenes/PreloadScene';
+import GameScene from './Game/scenes/GameScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -12,7 +13,7 @@ const config: Phaser.Types.Core.GameConfig = {
         mode: Phaser.Scale.RESIZE,
     },
     backgroundColor: '#05682D',
-    scene: [PreloadScene],
+    scene: [PreloadScene, GameScene],
 };
 
 export default new Phaser.Game(config);
