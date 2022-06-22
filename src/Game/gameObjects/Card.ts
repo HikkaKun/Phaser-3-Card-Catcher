@@ -13,6 +13,7 @@ export default class Card extends Phaser.GameObjects.Image {
 
     private _tween!: Phaser.Tweens.Tween;
     private _sceneWidth = 0;
+    private _destination!: Phaser.Math.Vector2;
 
     //#endregion
 
@@ -20,7 +21,7 @@ export default class Card extends Phaser.GameObjects.Image {
 
     catchCallback!: Function;
 
-    init(flyDuration, texture = null) {
+    init(flyDuration, targetY, texture = null) {
         if (texture != null) {
             this.setTexture(texture);
         }
@@ -32,6 +33,7 @@ export default class Card extends Phaser.GameObjects.Image {
             targets: this,
             ease: 'Linear',
             angle: angle,
+            y: targetY,
             duration: flyDuration,
             onUpdate: (tween) => this.onTweenUpdate(tween),
             onComplete: () => this.onTweenComplete(),
@@ -49,11 +51,11 @@ export default class Card extends Phaser.GameObjects.Image {
 
     //#region lifecycle callbacks
 
-    constructor(scene, x, y, texture, flyDuration = 3000) {
+    constructor(scene, x, y, texture, flyDuration, targetY) {
         super(scene, x, y, texture);
 
         this.setInteractive();
-        this.init(flyDuration);
+        this.init(flyDuration, targetY);
         this._handleEvents();
         this.onResize(this.scene.scale.gameSize, this.scene.cameras.main.zoom);
     }
@@ -73,6 +75,11 @@ export default class Card extends Phaser.GameObjects.Image {
     //#endregion
 
     //#region public methods
+
+    stop() {
+        this._tween && this._tween.stop();
+    }
+
     //#endregion
 
     //#region event handlers

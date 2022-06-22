@@ -12,7 +12,6 @@ const config: Phaser.Types.Core.GameConfig = {
     scale: {
         mode: Phaser.Scale.RESIZE,
     },
-    backgroundColor: '#05682D',
     scene: [PreloadScene, GameScene],
 };
 
