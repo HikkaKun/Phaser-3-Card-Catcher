@@ -20,6 +20,7 @@ export default class Card extends Phaser.GameObjects.Image {
     //#region public fields
 
     catchCallback!: Function;
+    completeCallback!: Function;
 
     init(flyDuration, targetY, texture = null) {
         if (texture != null) {
@@ -38,6 +39,8 @@ export default class Card extends Phaser.GameObjects.Image {
             onUpdate: (tween) => this.onTweenUpdate(tween),
             onComplete: () => this.onTweenComplete(),
         });
+
+        return this;
     }
 
     destroy(fromScene?: boolean | undefined): void {
@@ -76,7 +79,7 @@ export default class Card extends Phaser.GameObjects.Image {
 
     //#region public methods
 
-    stop() {
+    stopRotation() {
         this._tween && this._tween.stop();
     }
 
@@ -91,7 +94,7 @@ export default class Card extends Phaser.GameObjects.Image {
     }
 
     onTweenComplete() {
-        this.visible = false;
+        this.completeCallback instanceof Function && this.completeCallback();
     }
 
     onResize(gameSize: Phaser.Structs.Size, zoom: number) {

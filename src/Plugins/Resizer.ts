@@ -13,6 +13,10 @@ class Resizer {
     //#region private fields
 
     private _camera!: Phaser.Cameras.Scene2D.Camera;
+    private _isLandscape!: boolean;
+    private _zoom = 1;
+    private _gameSize!: Phaser.Structs.Size;
+    private _zoomedGameSize!: Phaser.Structs.Size;
 
     //#endregion
 
@@ -28,6 +32,22 @@ class Resizer {
         this._camera = camera;
 
         this.onResize(this.game.scale.gameSize);
+    }
+
+    get isLandscape() {
+        return this._isLandscape;
+    }
+
+    get zoom() {
+        return this._zoom;
+    }
+
+    get gameSize() {
+        return this._gameSize;
+    }
+
+    get zoomedGameSize() {
+        return this._zoomedGameSize;
     }
 
     //#endregion
@@ -53,6 +73,9 @@ class Resizer {
         const height = this.game.config.height as number;
 
         const isLandscape = gameSize.width > gameSize.height;
+
+        this._isLandscape = isLandscape;
+
         let zoom = 1;
 
         if (isLandscape) {
@@ -62,8 +85,11 @@ class Resizer {
         }
 
         camera.zoom = zoom;
+        this._zoom = zoom;
+        this._gameSize = gameSize;
+        this._zoomedGameSize = new Phaser.Structs.Size(gameSize.width / zoom, gameSize.height / zoom);
 
-        SystemEvents.emit(GameEvents.Resize, gameSize, zoom);
+        SystemEvents.emit(GameEvents.Resize, gameSize, zoom, this.zoomedGameSize);
     }
 
     //#endregion
