@@ -12,6 +12,9 @@ import SceneKeys from '../enums/SceneKeys';
 
 export default class PreloadScene extends Phaser.Scene {
     //#region private fields
+
+    private _text!: Phaser.GameObjects.Text;
+
     //#endregion
 
     //#region public fields
@@ -23,24 +26,39 @@ export default class PreloadScene extends Phaser.Scene {
         super(SceneKeys.Preload);
     }
 
-    preload() {
-        fetch('https://deckofcardsapi.com/api/deck/new/draw/?count=52').then((response) => {
-            response.json().then((data) => this._loadCards(data));
-        });
-    }
-
     create() {
-        Resizer.game = this.game;
-        Resizer.camera = this.cameras.main;
-
-        this.scale.on(Phaser.Scale.Events.RESIZE, Resizer.onResize, Resizer);
+        this._initResizer();
+        this._initText();
+        this._loadCards();
     }
 
     //#endregion
 
     //#region private methods
 
-    private _loadCards(data) {
+    private _initResizer() {
+        Resizer.game = this.game;
+        Resizer.camera = this.cameras.main;
+
+        this.scale.on(Phaser.Scale.Events.RESIZE, Resizer.onResize, Resizer);
+    }
+
+    private _initText() {
+        this._text = this.add
+            .text((this.game.config.width as number) / 2, (this.game.config.height as number) / 2, 'Fetching new deck...', {
+                fontSize: '30pt',
+                align: 'center',
+            })
+            .setOrigin(0.5);
+        this.cameras.main.startFollow(this._text);
+    }
+
+    private async _loadCards() {
+        const response = await fetch('https://deckofcardsapi.com/api/deck/new/draw/?count=52');
+        const data = await response.json();
+
+        this._text.text = 'Loading images...';
+
         for (const card of data.cards) {
             Globals.cards.push(card.code);
             this.load.image(card.code, card.image);
@@ -58,6 +76,8 @@ export default class PreloadScene extends Phaser.Scene {
     //#region event handlers
 
     onLoadingComplete() {
+        this._text.text = 'Done';
+
         this.scene.start(SceneKeys.Game);
     }
 

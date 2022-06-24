@@ -1,34 +1,48 @@
+//#region import
+
 import Utilities from '~/Plugins/Utilities';
 
-interface IGlobals {
-    cards: string[];
+//#endregion
 
-    getCardKey: Function;
-}
+//#region class helpers
+//#endregion
 
-function cardCounter() {
-    let i = 0;
+class Globals {
+    //#region private fields
 
-    return function () {
-        if (i >= Globals.cards.length) {
-            Utilities.shuffleArray(Globals.cards);
-            i = 0;
+    private _currentCardIndex = 0;
+
+    //#endregion
+
+    //#region public fields
+
+    cards: string[] = [];
+
+    //#endregion
+
+    //#region lifecycle callbacks
+
+    constructor() {}
+
+    //#endregion
+
+    //#region private methods
+    //#endregion
+
+    //#region public methods
+
+    getCardKey() {
+        if (this._currentCardIndex == this.cards.length) {
+            return undefined;
         }
 
-        return i++;
-    };
+        return this.cards[this._currentCardIndex++];
+    }
+
+    //#endregion
+
+    //#region event handlers
+    //#endregion
 }
 
-const getCardIndex = cardCounter();
-
-const Globals: IGlobals = {
-    cards: [],
-
-    getCardKey: function () {
-        const i = getCardIndex();
-
-        return this.cards[i];
-    },
-};
-
-export default Globals;
+export default new Globals();

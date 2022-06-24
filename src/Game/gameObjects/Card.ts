@@ -22,7 +22,7 @@ export default class Card extends Phaser.GameObjects.Image {
     catchCallback!: Function;
     completeCallback!: Function;
 
-    init(flyDuration, targetY, texture = null) {
+    init(flyDuration: number, targetY: number, texture?: string) {
         if (texture != null) {
             this.setTexture(texture);
         }
@@ -54,7 +54,7 @@ export default class Card extends Phaser.GameObjects.Image {
 
     //#region lifecycle callbacks
 
-    constructor(scene, x, y, texture, flyDuration, targetY) {
+    constructor(scene, x, y, texture: string, flyDuration: number, targetY: number) {
         super(scene, x, y, texture);
 
         this.setInteractive();

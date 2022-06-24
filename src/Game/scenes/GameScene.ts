@@ -19,6 +19,7 @@ export default class GameScene extends Phaser.Scene {
 
     private _decks!: Phaser.GameObjects.Container;
     private _deckMaxBounds!: Phaser.Structs.Size;
+    private _deckOffsetY = 0;
     private _currentDeck!: Deck;
 
     private _flyDuration = 3000;
@@ -69,12 +70,19 @@ export default class GameScene extends Phaser.Scene {
     }
 
     private _throwNewCard(cardInstance?: Card) {
+        const texture = Globals.getCardKey();
+
+        if (!texture) {
+            //game over
+
+            return;
+        }
+
         const a = this.game.config.height as number;
         const startY = Phaser.Math.RND.between(a * 0.1, a * 0.9);
         const targetY = Phaser.Math.RND.between(a * 0.1, a * 0.9);
         const card =
-            cardInstance?.init(this._flyDuration, targetY, Globals.getCardKey()) ??
-            new Card(this, -10000, startY, Globals.getCardKey(), this._flyDuration, targetY);
+            cardInstance?.init(this._flyDuration, targetY, texture) ?? new Card(this, -10000, startY, texture, this._flyDuration, targetY);
 
         card.catchCallback = () => {
             const deck = this._getDeck();
@@ -114,15 +122,17 @@ export default class GameScene extends Phaser.Scene {
 
     private _getDeck(): Deck {
         if (this._currentDeck == null || this._currentDeck.isFull) {
-            this._currentDeck = new Deck(this, 540, 540);
+            this._currentDeck = new Deck(this);
             this._decks.add(this._currentDeck);
+
+            this._calculateDecksPosition();
         }
 
         return this._currentDeck;
     }
 
     private _initDeckMaxBounds() {
-        const deck = new Deck(this, 540, 540);
+        const deck = new Deck(this);
 
         for (let i = 0; i < Deck.MAX_CARDS; i++) {
             const card = new Card(this, 0, 0, Globals.cards[0], 0, 0);
@@ -137,10 +147,29 @@ export default class GameScene extends Phaser.Scene {
         setTimeout(() => {
             const bounds = deck.getBounds();
 
+            this._deckOffsetY = -(bounds.height + bounds.y);
+
             this._deckMaxBounds = new Phaser.Structs.Size(bounds.width, bounds.height);
 
             deck.destroy();
         });
+    }
+
+    private _calculateDecksPosition(gameSize?: Phaser.Structs.Size, zoom?: number, zoomedGameSize?: Phaser.Structs.Size) {
+        if (!this._deckMaxBounds) return;
+
+        gameSize = gameSize ?? Resizer.gameSize;
+        zoomedGameSize = zoomedGameSize ?? Resizer.zoomedGameSize;
+        zoom = zoom ?? Resizer.zoom;
+
+        const zoomedDeckWidth = this._deckMaxBounds.width / zoom;
+        const length = this._decks.list.length;
+
+        for (let i = 0; i < length; i++) {
+            const deck = this._decks.list[i] as Deck;
+
+            deck.y = this._deckOffsetY + this.cameras.main.worldView.bottom - zoomedGameSize.height * 0.01;
+        }
     }
 
     //#endregion
@@ -150,7 +179,9 @@ export default class GameScene extends Phaser.Scene {
 
     //#region event handlers
 
-    onResize(gameSize: Phaser.Structs.Size, zoom: number) {}
+    onResize(gameSize: Phaser.Structs.Size, zoom: number, zoomedGameSize: Phaser.Structs.Size) {
+        this._calculateDecksPosition();
+    }
 
     //#endregion
 }
