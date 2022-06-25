@@ -1,6 +1,7 @@
 //#region import
 
 import Phaser from 'phaser';
+import Resizer from '~/Plugins/Resizer';
 import SystemEvents from '~/Plugins/SystemEvents/SystemEvents';
 import GameEvents from '../enums/GameEvents';
 
@@ -13,16 +14,28 @@ export default class Card extends Phaser.GameObjects.Image {
 
     private _tween!: Phaser.Tweens.Tween;
     private _sceneWidth = 0;
-    private _destination!: Phaser.Math.Vector2;
+
+    private _scaleMultiplier = 1;
+    private _screenHeightScaler = 1;
 
     //#endregion
 
     //#region public fields
 
+    get scaleMultiplier() {
+        return this._scaleMultiplier;
+    }
+
+    set scaleMultiplier(value) {
+        this._scaleMultiplier = value;
+
+        this._updateSize();
+    }
+
     catchCallback!: Function;
     completeCallback!: Function;
 
-    init(flyDuration: number, targetY: number, texture?: string) {
+    init(flyDuration: number, targetY: number, texture?: string, isRotating = true) {
         if (texture != null) {
             this.setTexture(texture);
         }
@@ -30,15 +43,18 @@ export default class Card extends Phaser.GameObjects.Image {
         const angle = (Phaser.Math.RND.between(360, 540) / 1000) * flyDuration * (Math.random() < 0.5 ? -1 : 1);
 
         this._tween && this._tween.stop();
-        this._tween = this.scene.tweens.add({
-            targets: this,
-            ease: 'Linear',
-            angle: angle,
-            y: targetY,
-            duration: flyDuration,
-            onUpdate: (tween) => this.onTweenUpdate(tween),
-            onComplete: () => this.onTweenComplete(),
-        });
+
+        if (isRotating) {
+            this._tween = this.scene.tweens.add({
+                targets: this,
+                ease: 'Linear',
+                angle: angle,
+                y: targetY,
+                duration: flyDuration,
+                onUpdate: (tween) => this.onTweenUpdate(tween),
+                onComplete: () => this.onTweenComplete(),
+            });
+        }
 
         return this;
     }
@@ -54,13 +70,13 @@ export default class Card extends Phaser.GameObjects.Image {
 
     //#region lifecycle callbacks
 
-    constructor(scene, x, y, texture: string, flyDuration: number, targetY: number) {
+    constructor(scene, x, y, texture: string, flyDuration: number, targetY: number, isRotating = true) {
         super(scene, x, y, texture);
 
         this.setInteractive();
-        this.init(flyDuration, targetY);
+        this.init(flyDuration, targetY, undefined, isRotating);
         this._handleEvents();
-        this.onResize(this.scene.scale.gameSize, this.scene.cameras.main.zoom);
+        this.onResize(Resizer.gameSize, Resizer.zoom, Resizer.zoomedGameSize);
     }
 
     //#endregion
@@ -73,6 +89,10 @@ export default class Card extends Phaser.GameObjects.Image {
         SystemEvents[func](GameEvents.Resize, this.onResize, this);
 
         this[func]('pointerdown', this.onDown, this);
+    }
+
+    private _updateSize() {
+        this.scale = this._screenHeightScaler * this._scaleMultiplier;
     }
 
     //#endregion
@@ -97,10 +117,12 @@ export default class Card extends Phaser.GameObjects.Image {
         this.completeCallback instanceof Function && this.completeCallback();
     }
 
-    onResize(gameSize: Phaser.Structs.Size, zoom: number) {
-        this.scale = gameSize.height / zoom / 4 / this.height;
+    onResize(gameSize: Phaser.Structs.Size, zoom: number, zoomedGameSize: Phaser.Structs.Size) {
+        this._screenHeightScaler = zoomedGameSize.height / 4 / this.height;
 
-        this._sceneWidth = gameSize.width / zoom + this.height * this.scale;
+        this._sceneWidth = zoomedGameSize.width + this.height * this.scale;
+
+        this._updateSize();
     }
 
     onDown() {

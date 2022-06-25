@@ -46,7 +46,7 @@ export default class PreloadScene extends Phaser.Scene {
     private _initText() {
         this._text = this.add
             .text((this.game.config.width as number) / 2, (this.game.config.height as number) / 2, 'Fetching new deck...', {
-                fontSize: '30pt',
+                fontSize: '56pt',
                 align: 'center',
             })
             .setOrigin(0.5);

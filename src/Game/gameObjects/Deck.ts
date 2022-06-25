@@ -21,8 +21,10 @@ export default class Deck extends Phaser.GameObjects.Container {
     static MAX_CARDS = Deck.MAX_ANGLE / Deck.MIN_ANGLE_BETWEEN + 1;
 
     get isFull(): boolean {
-        return this.list.length >= Deck.MAX_CARDS;
+        return Math.max(this.list.length, this.cards) >= Deck.MAX_CARDS;
     }
+
+    cards = 0; //just to fix bug when cards add to late because of tween. It causes max cards overflow
 
     //#endregion
 
