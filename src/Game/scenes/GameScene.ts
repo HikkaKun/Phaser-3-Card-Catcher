@@ -6,6 +6,7 @@ import SystemEvents from '~/Plugins/SystemEvents/SystemEvents';
 import GameEvents from '../enums/GameEvents';
 import Globals from '../enums/Globals';
 import SceneKeys from '../enums/SceneKeys';
+import TextureKeys from '../enums/TextureKeys';
 import Card from '../gameObjects/Card';
 import Deck from '../gameObjects/Deck';
 
@@ -20,6 +21,8 @@ export default class GameScene extends Phaser.Scene {
     private _decks!: Phaser.GameObjects.Container;
     private _currentDeck!: Deck;
     private _boundsDeck!: Deck;
+
+    private _background!: Phaser.GameObjects.Image;
 
     private _flyDuration = 3000;
 
@@ -56,12 +59,19 @@ export default class GameScene extends Phaser.Scene {
 
         Resizer.camera = camera;
 
-        const cameraCenter = this.add.container((this.game.config.width as number) / 2, (this.game.config.height as number) / 2);
-        camera.startFollow(cameraCenter);
+        const background = this.add.image(
+            (this.game.config.width as number) / 2,
+            (this.game.config.height as number) / 2,
+            TextureKeys.Background
+        );
+        camera.startFollow(background);
+
+        this._background = background;
 
         this._decks = this.add.container();
 
         this._throwNewCard();
+        this.onResize(Resizer.gameSize, Resizer.zoom, Resizer.zoomedGameSize);
     }
 
     update(time: number, delta: number): void {
@@ -84,8 +94,9 @@ export default class GameScene extends Phaser.Scene {
         const texture = Globals.getCardKey();
 
         if (!texture) {
-            //game over
             cardInstance && cardInstance.destroy();
+
+            this._gameOver();
 
             return;
         }
@@ -166,7 +177,7 @@ export default class GameScene extends Phaser.Scene {
 
     private _calculateDecksPosition(isImmediately = true) {
         if (!this._deckMaxBounds) return;
-        if (this._decks.list.length == 0) return;
+        if (!this._decks || this._decks.list.length == 0) return;
 
         const zoomedGameSize = Resizer.zoomedGameSize;
 
@@ -182,6 +193,7 @@ export default class GameScene extends Phaser.Scene {
         horizontal = Math.max(horizontal, 1);
 
         const offsetX = zoomedGameSize.width * 0.5;
+        const offsetYBetween = -this._deckMaxBounds.height * 0.5;
 
         for (let i = 0; i < length; i++) {
             const deck = this._decks.list[i] as Deck;
@@ -192,9 +204,14 @@ export default class GameScene extends Phaser.Scene {
                 (this._deckMaxBounds.width + distanceBetween) * ((i % horizontal) - Math.min(horizontal, length) / 2 + 0.5);
 
             const y =
-                this._deckOffsetY * (1 + Math.floor((length - i - 1) / horizontal)) +
+                this._deckOffsetY +
+                offsetYBetween * Math.floor((length - i - 1) / horizontal) +
                 this.cameras.main.worldView.bottom -
                 zoomedGameSize.height * 0.01;
+
+            if (this._deckMaxBounds.width > zoomedGameSize.width) {
+                deck.scale = zoomedGameSize.width / this._deckMaxBounds.width;
+            }
 
             if (isImmediately) {
                 deck.x = x;
@@ -203,11 +220,16 @@ export default class GameScene extends Phaser.Scene {
                 deck.x = Phaser.Math.Linear(deck.x, x, 0.1);
                 deck.y = Phaser.Math.Linear(deck.y, y, 0.1);
             }
-
-            if (this._deckMaxBounds.width > zoomedGameSize.width) {
-                deck.scale = zoomedGameSize.width / this._deckMaxBounds.width;
-            }
         }
+    }
+
+    private _gameOver() {
+        const x = (this.game.config.width as number) / 2;
+        const y = (this.game.config.height as number) / 2;
+
+        this.add
+            .text(x, y, 'Game Over', { fontSize: '90pt', color: 'white', fontStyle: 'bold', strokeThickness: 20, stroke: 'black' })
+            .setOrigin(0.5);
     }
 
     //#endregion
@@ -218,9 +240,11 @@ export default class GameScene extends Phaser.Scene {
     //#region event handlers
 
     onResize(gameSize: Phaser.Structs.Size, zoom: number, zoomedGameSize: Phaser.Structs.Size) {
-        setTimeout(() => {
-            this._calculateDecksPosition();
-        });
+        if (this._background) {
+            this._background.setDisplaySize(zoomedGameSize.width, zoomedGameSize.height);
+        }
+
+        this._calculateDecksPosition();
     }
 
     //#endregion

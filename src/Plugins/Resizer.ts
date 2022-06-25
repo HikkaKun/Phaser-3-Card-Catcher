@@ -89,7 +89,9 @@ class Resizer {
         this._gameSize = gameSize;
         this._zoomedGameSize = new Phaser.Structs.Size(gameSize.width / zoom, gameSize.height / zoom);
 
-        SystemEvents.emit(GameEvents.Resize, gameSize, zoom, this.zoomedGameSize);
+        setTimeout(() => {
+            SystemEvents.emit(GameEvents.Resize, gameSize, zoom, this.zoomedGameSize);
+        });
     }
 
     //#endregion

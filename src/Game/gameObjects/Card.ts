@@ -93,6 +93,8 @@ export default class Card extends Phaser.GameObjects.Image {
 
     private _updateSize() {
         this.scale = this._screenHeightScaler * this._scaleMultiplier;
+
+        this._sceneWidth = Resizer.zoomedGameSize.width + this.height * this.scale;
     }
 
     //#endregion
@@ -119,8 +121,6 @@ export default class Card extends Phaser.GameObjects.Image {
 
     onResize(gameSize: Phaser.Structs.Size, zoom: number, zoomedGameSize: Phaser.Structs.Size) {
         this._screenHeightScaler = zoomedGameSize.height / 4 / this.height;
-
-        this._sceneWidth = zoomedGameSize.width + this.height * this.scale;
 
         this._updateSize();
     }

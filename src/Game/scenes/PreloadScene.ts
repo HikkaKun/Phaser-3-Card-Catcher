@@ -4,6 +4,7 @@ import Phaser from 'phaser';
 import Resizer from '~/Plugins/Resizer';
 import Globals from '../enums/Globals';
 import SceneKeys from '../enums/SceneKeys';
+import TextureKeys from '../enums/TextureKeys';
 
 //#endregion
 
@@ -29,6 +30,9 @@ export default class PreloadScene extends Phaser.Scene {
     create() {
         this._initResizer();
         this._initText();
+
+        this.load.image(TextureKeys.Background, 'images/background.jpg');
+
         this._loadCards();
     }
 
