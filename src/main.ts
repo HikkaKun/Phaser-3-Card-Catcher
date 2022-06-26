@@ -1,5 +1,3 @@
-import 'regenerator-runtime/runtime';
-
 import Phaser from 'phaser';
 
 import PreloadScene from './Game/scenes/PreloadScene';

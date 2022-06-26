@@ -12,7 +12,8 @@
         "experimentalDecorators": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
-        "sourceMap": true,
+        "sourceMap": false,
+        "removeComments": true,
         "baseUrl": "./src",
         "paths": {
             "~/*": ["./*"]

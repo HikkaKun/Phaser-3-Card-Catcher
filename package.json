@@ -4,7 +4,7 @@
     "description": "Test task",
     "scripts": {
         "dev": "parcel src/index.html -p 3000 --dist-dir development",
-        "build": "rimraf dist && parcel build src/index.html --dist-dir dist"
+        "build": "rimraf dist && parcel build src/index.html --dist-dir dist --no-source-maps"
     },
     "author": "homohikka",
     "license": "",
@@ -23,5 +23,10 @@
     },
     "staticFiles": {
         "staticPath": "public"
+    },
+    "targets": {
+        "main": {
+            "optimize": true
+        }
     }
 }
