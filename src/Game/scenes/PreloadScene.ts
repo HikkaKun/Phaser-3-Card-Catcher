@@ -59,6 +59,13 @@ export default class PreloadScene extends Phaser.Scene {
 
     private async _loadCards() {
         const response = await fetch('https://deckofcardsapi.com/api/deck/new/draw/?count=52');
+
+        if (!response.ok) {
+            this._text.text = 'Cant connect to\ndeckofcardsapi.com';
+
+            return;
+        }
+
         const data = await response.json();
 
         this._text.text = 'Loading images...';
