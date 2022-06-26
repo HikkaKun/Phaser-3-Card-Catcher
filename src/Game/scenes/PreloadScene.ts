@@ -1,7 +1,7 @@
 //#region import
 
 import Phaser from 'phaser';
-import Resizer from '~/Plugins/Resizer';
+import Resizer from '../../Plugins/Resizer';
 import Globals from '../enums/Globals';
 import SceneKeys from '../enums/SceneKeys';
 import TextureKeys from '../enums/TextureKeys';

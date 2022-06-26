@@ -1,8 +1,8 @@
 //#region import
 
 import Phaser from 'phaser';
-import Resizer from '~/Plugins/Resizer';
-import SystemEvents from '~/Plugins/SystemEvents/SystemEvents';
+import Resizer from '../../Plugins/Resizer';
+import SystemEvents from '../../Plugins/SystemEvents/SystemEvents';
 import GameEvents from '../enums/GameEvents';
 
 //#endregion

@@ -1,7 +1,7 @@
 //#region import
 
 import Phaser from 'phaser';
-import GameEvents from '~/Game/enums/GameEvents';
+import GameEvents from '../Game/enums/GameEvents';
 import SystemEvents from './SystemEvents/SystemEvents';
 
 //#endregion
